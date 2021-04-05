@@ -57,11 +57,11 @@ module.exports = {
       Utils: paths.appSrcUtils,
     },
   },
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
-    axios: 'axios',
-  },
+  // externals: {
+  //   react: 'React',
+  //   'react-dom': 'ReactDOM',
+  //   axios: 'axios',
+  // },
   module: {
     rules: [
       {
