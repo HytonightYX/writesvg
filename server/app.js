@@ -1,20 +1,24 @@
-const Koa = require('koa')
-const cors = require('@koa/cors')
-const InitManager = require('./core/init')
-const bodyParser = require('koa-bodyparser')
-const catchError = require('./middlewares/exception')
+const Koa = require('koa');
+const cors = require('@koa/cors');
+const InitManager = require('./core/init');
+const bodyParser = require('koa-bodyparser');
+const catchError = require('./middlewares/exception');
 
-const app = new Koa()
+const app = new Koa();
 
-require('./app/models/user')
+require('./app/models/user');
 
-app.use(cors())
-app.use(bodyParser())
-app.use(catchError)
+app.use(cors());
+app.use(bodyParser());
+app.use(catchError);
 
-InitManager.initCore(app)
+InitManager.initCore(app);
 
-if (global.config.env === 'dev') { }
+if (global.config.env === 'dev') {
+}
 
-app.listen(3030, () => { })
+const port = 3030;
 
+app.listen(port, () => {
+  console.log(`server start on ${port}`);
+});
