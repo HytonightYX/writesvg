@@ -6,7 +6,7 @@
 **/.vscode
 **/.DS_Store
 
-**/yarn.lock
+**/*.log
 
 # Project exclude paths
 /server/node_modules/
