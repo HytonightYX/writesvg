@@ -1,8 +1,9 @@
 import { qiniu } from '../secret';
+import {} from '@ant-design/icons';
 
 export const MENU_MAIN = [
-  { title: '发现', icon: 'lightbulb outline', path: '/' },
-  { title: '我的笔记', icon: 'book', path: '/mynote' },
+  { title: '发现', path: '/' },
+  { title: '我的笔记', path: '/mynote' },
 ];
 
 export const FIND_MENU = [
@@ -22,4 +23,8 @@ export const SYSTEM_CONFIG = {
     BASE_QINIU_URL: 'http://qn-noter.yunxi.site/',
     QINIU_SERVER: 'https://upload-z2.qiniup.com',
   },
+};
+
+export const ASSETS = {
+  logo64: 'https://i.loli.net/2021/04/05/5ahozSgW68j7ycm.png',
 };
