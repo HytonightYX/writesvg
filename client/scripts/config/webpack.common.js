@@ -50,11 +50,12 @@ module.exports = {
     },
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.json'],
+    extensions: ['.tsx', '.ts', '.js', 'jsx', '.json'],
     alias: {
-      Src: paths.appSrc,
-      Components: paths.appSrcComponents,
-      Utils: paths.appSrcUtils,
+      src: paths.appSrc,
+      components: paths.appSrcComponents,
+      utils: paths.appSrcUtils,
+      pages: paths.appPages,
     },
   },
   // externals: {
