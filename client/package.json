@@ -1,5 +1,5 @@
 {
-  "name": "noter-cliet",
+  "name": "writesvg-client",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -108,3 +108,5 @@
     "not ie <= 10"
   ]
 }
+
+
