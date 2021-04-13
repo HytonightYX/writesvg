@@ -4,13 +4,13 @@ import { Header } from 'components/header';
 import { LoginGuard } from 'components/private-route';
 
 import { Find } from './pages/find';
-// import Write from './page/write';
-// import Profile from './page/profile';
+import { Write } from './pages/write';
+import { Profile } from './pages/profile';
 import { Login } from './pages/login';
 // import MyNote from './page/mynote';
 import { Note } from './pages/post';
 // import Edit from './page/edit';
-// import Setting from './page/setting';
+import { Setting } from './pages/setting';
 
 import 'antd/dist/antd.css';
 import './style/global.less';
@@ -25,12 +25,12 @@ function App() {
           <Switch>
             <Route exact path='/login' component={Login} />
             {/* <Route exact path='/find' component={Find} /> */}
-            {/* <Route exact path='/write' component={Write} /> */}
+            <Route exact path='/write' component={Write} />
             {/* <Route exact path='/mynote' component={MyNote} /> */}
-            {/* <Route exact path='/profile' component={Profile} /> */}
+            <Route exact path='/profile' component={Profile} />
             <Route exact path='/post/:id' component={Note} />
             {/* <Route exact path='/edit/:id' component={Edit} /> */}
-            {/* <Route exact path='/setting' component={Setting} /> */}
+            <Route exact path='/setting' component={Setting} />
 
             <Route path='/' component={Find} />
           </Switch>

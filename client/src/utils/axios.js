@@ -23,7 +23,7 @@ axiosIns.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.error(error),
+  (error) => Promise.reject(error),
 );
 
 /**

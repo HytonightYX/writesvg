@@ -1,12 +1,17 @@
-import { useQuery } from 'react-query';
-import { axios_get } from './axios';
+import { useMutation, useQuery } from 'react-query';
+import { axios_get, axios_post } from './axios';
+import axios from 'axios';
 import { QueryKeys, User } from './types';
+import { queryClient } from 'src/query-client';
+
+const { CancelToken } = axios;
 
 export async function login(code: string) {
+  console.log('获得 code');
   const data = await axios_get('token/github?code=' + code);
   const { token } = data;
 
-  // presist token
+  // 将 token 存储本地
   window.localStorage.setItem('token', token);
 
   return token;
@@ -20,29 +25,45 @@ export const usePosts = () =>
 
 export const useUser = () =>
   useQuery<User, Error>(QueryKeys.User, async () => {
-    const userinfo = await axios_get('user/info');
-    return userinfo as User;
+    const source = CancelToken.source();
+
+    const data = await axios_get('/user/info', {
+      cancelToken: source.token,
+    });
+
+    return data as User;
   });
 
-export const useToken = (code: string | null, enabled: boolean) =>
-  useQuery<string, Error>(
-    QueryKeys.Token,
-    async () => {
-      const data = await axios_get('token/github?code=' + code);
-      const { token } = data;
-      return token;
+export const useUserUpdate = () =>
+  useMutation((payload: User) => axios_post('user/modify', payload), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(QueryKeys.User);
     },
-    {
-      // 需要手动触发
-      enabled,
-      retry: 0,
-      // 8 小时后重新 fetch (token 过期时间)
-      staleTime: 1000 * 60 * 60 * 8,
-    },
-  );
+  });
+
+export const useQiniuToken = () =>
+  useQuery<string, Error>(QueryKeys.QiniuToken, async () => {
+    const data = await axios_get('token/qiniu');
+    const { token } = data;
+    return token;
+  });
 
 export const usePost = (id: number) =>
   useQuery([QueryKeys.Post, id], async () => {
     const data = await axios_get(`note/${id}`);
+    return data;
+  });
+
+export const useUserStatus = () =>
+  useQuery([QueryKeys.UserStatus], async () => {
+    const data = await axios_get('user/status');
+    return data;
+  });
+
+export const useCreatePost = () => useMutation((newPost) => axios_post('note/add', newPost));
+
+export const useTabList = (tag: string) =>
+  useQuery([QueryKeys.Tabs, tag], async () => {
+    const data = await axios_get('tags', { tag });
     return data;
   });
