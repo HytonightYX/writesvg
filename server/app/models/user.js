@@ -1,6 +1,7 @@
 const { db } = require('../../core/db');
 const { DataTypes, Model } = require('sequelize');
 const bcryptjs = require('bcryptjs');
+const { NotFound } = require('../../core/httpException');
 
 /**
  * User 模板,数据库生成user表
@@ -76,7 +77,13 @@ class User extends Model {
    * @param id 用户id
    */
   static async getUserInfo(id) {
-    return await User.findByPk(id);
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      throw new NotFound('未找到该用户');
+    }
+
+    return user;
   }
 
   /**
@@ -154,10 +161,7 @@ User.init(
     // 用户名
     userName: DataTypes.STRING(64),
     // 邮箱
-    email: {
-      type: DataTypes.STRING, // 最大长度
-      unique: true, // 唯一
-    },
+    email: DataTypes.STRING(128),
     // 密码
     password: {
       // 观察者模式
@@ -175,12 +179,6 @@ User.init(
     },
     // 真实姓名
     realName: DataTypes.STRING(64),
-    // 性别
-    sex: DataTypes.INTEGER,
-    // 邮箱
-    email: DataTypes.STRING(255),
-    // 专长
-    expertise: DataTypes.STRING(255),
     // 简介
     desc: DataTypes.STRING(255),
     // 用户头像

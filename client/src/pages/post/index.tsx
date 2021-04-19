@@ -1,26 +1,27 @@
 import React from 'react';
-import { useParams, withRouter } from 'react-router';
+import { useParams } from 'react-router';
 import FixedBar from '../../components/fixedbar';
 import NoteBar from '../../components/NoteBar';
-import { axios_get } from '../../utils/axios';
-import { SYSTEM_CONFIG } from '../../constant/config';
 import { dateToFromNow } from '../../utils/date';
 import { usePost } from 'src/utils/request';
 import './style.less';
-
-const { BASE_QINIU_URL } = SYSTEM_CONFIG.qiniu;
+import { Image } from 'antd';
+import { Block } from 'src/utils/types';
+import { LoadingOutlined } from '@ant-design/icons';
 
 export function Note() {
   const { id } = useParams<any>();
   const { data: post } = usePost(id);
+  console.log(post);
 
   return (
     <div className='g-note'>
       <div className='m-header'>
         <div className='header-img'>
-          <img
-            src={post?.cover ? BASE_QINIU_URL + post?.cover + '?imageslim' : 'https://picsum.photos/600/300'}
-            alt=''
+          <Image
+            height='354px'
+            preview={false}
+            src={post?.cover ? post.cover + '?imageslim' : 'https://picsum.photos/600/300'}
           />
         </div>
 
@@ -31,14 +32,16 @@ export function Note() {
             <span className='user-icon'>
               <img src={post?.avatar} alt='' />
             </span>
-            <span className='name'>{post?.user_name}</span>
+            <span className='name'>{post?.userName}</span>
           </div>
-          <div className='time'>{dateToFromNow(post?.created_at)}</div>
+          <div className='time'>{dateToFromNow(post?.createdAt)}</div>
         </div>
       </div>
 
       <div className='content'>
-        <div className='braft-output-content' dangerouslySetInnerHTML={{ __html: post?.html }} />
+        {post?.blocks.map((block: Block) => (
+          <Image src={block.svgUrl} placeholder={<LoadingOutlined />} width='100%' style={{ objectFit: 'contain' }} />
+        ))}
       </div>
 
       <FixedBar />

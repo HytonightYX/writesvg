@@ -3,7 +3,7 @@ import {} from '@ant-design/icons';
 
 export const MENU_MAIN = [
   { title: '发现', path: '/' },
-  { title: '我的笔记', path: '/mynote' },
+  { title: '我的', path: '/my' },
 ];
 
 export const FIND_MENU = [
@@ -21,6 +21,7 @@ export const SYSTEM_CONFIG = {
     AccessKey: '25E0vVorHfwQElXxDFiyo3dydVPg7gpmAy7eRjrt',
     SecretKey: qiniu.SecretKey,
     BASE_QINIU_URL: 'http://qn-noter.yunxi.site/',
+    // BASE_QINIU_URL: 'http://qq5kwabpf.hn-bkt.clouddn.com/',
     QINIU_SERVER: 'https://upload-z2.qiniup.com',
   },
 };

@@ -75,15 +75,14 @@ export const Container = styled.div`
 
     .m-logo {
       display: flex;
-      flex-direction: column-reverse;
-      padding-right: 10px;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
       img {
-        height: 30px;
+        height: 36px;
       }
     }
   }
 `;
 
-export const HeaderContainer = styled.div`
-  
-`;
+export const HeaderContainer = styled.div``;

@@ -26,8 +26,6 @@ const db = new Sequelize(dbName, user, pwd, {
   },
 });
 
-db.sync();
-
 /**
  * 全局:返回的时候删除三个时间戳
  * 功能简单粗暴单一

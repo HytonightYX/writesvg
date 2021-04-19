@@ -93,9 +93,14 @@ module.exports = {
           ...getCssLoaders(2),
           {
             loader: 'less-loader',
-            options: {
-              sourceMap: isDevelopment,
-            },
+            // lessOptions: {
+            // options: {
+            // modifyVars: {
+            //   'primary-color': '#292525',
+            // },
+            //   javascriptEnabled: true,
+            // },
+            // },
           },
         ],
       },

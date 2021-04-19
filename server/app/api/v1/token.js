@@ -74,7 +74,7 @@ router.get('/github', async (ctx) => {
 
     if (resp?.status === 200) {
       const { token, user } = await githubLogin(resp.data);
-      success('已获取 token', { token, type: 233 });
+      success('已获取 token', { token, user, type: 233 });
     }
   } else {
     throw new global.errs.Forbidden();
@@ -82,11 +82,11 @@ router.get('/github', async (ctx) => {
 });
 
 /**
- * 验证令牌接口
+ * 获取七牛云令牌
  */
-router.post('/qiniu', async (ctx) => {
+router.get('/qiniu', async (ctx) => {
   const token = getToken();
-  success(null, { token });
+  success(false, { token });
 });
 
 /**

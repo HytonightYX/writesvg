@@ -4,10 +4,9 @@
  * @param data 响应数据
  */
 function success(message, data) {
-	throw new global.errs.Success(message, data)
+  throw new global.errs.Success(message, data);
 }
 
 module.exports = {
-	success
-}
-
+  success,
+};

@@ -1,4 +1,3 @@
-import { Spin } from 'antd';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Placeholder } from 'semantic-ui-react';
@@ -7,68 +6,75 @@ import ICON from '../../asset/icon';
 import FixedBar from '../../components/fixedbar';
 import ImageLoader from '../../components/image-loader';
 import { FIND_MENU, SYSTEM_CONFIG } from '../../constant/config';
-
 import { dateToFromNow } from '../../utils/date';
 import { LoadingOutlined } from '@ant-design/icons';
-import { usePosts } from 'src/utils/request';
+import { useHot, usePosts } from 'src/utils/request';
 
 import './style.less';
 
 const { BASE_QINIU_URL } = SYSTEM_CONFIG.qiniu;
 
-const NoteCard = ({ note }: { note: any }) => (
-  <div className='note-card'>
-    <div style={{ width: 400, overflow: 'hidden' }}>
-      <LazyLoad
-        height={200}
-        once
-        throttle={250}
-        placeholder={
-          <Placeholder style={{ height: 200, width: 400 }}>
-            <Placeholder.Image />
-          </Placeholder>
-        }
-      >
-        <ImageLoader
-          src={
-            note.cover
-              ? `${BASE_QINIU_URL + note.cover}?imageslim`
-              : `https://picsum.photos/400/200?random=${Math.floor(Math.random() * 1000)}`
+const NoteCard = ({ note }: { note: any }) => {
+  if (!note) {
+    return null;
+  }
+  return (
+    <div className='note-card'>
+      <div style={{ width: 400, overflow: 'hidden' }}>
+        <LazyLoad
+          height={200}
+          once
+          throttle={250}
+          placeholder={
+            <Placeholder style={{ height: 200, width: 400 }}>
+              <Placeholder.Image />
+            </Placeholder>
           }
-        />
-      </LazyLoad>
-    </div>
-
-    <div className='card-content'>
-      <div className='note-title'>
-        <Link to={`/post/${note.id}`}>{note.title}</Link>
+        >
+          <ImageLoader
+            src={
+              note.cover
+                ? `${note.cover}?imageslim`
+                : `https://picsum.photos/400/200?random=${Math.floor(Math.random() * 1000)}`
+            }
+          />
+        </LazyLoad>
       </div>
 
-      <div className='note-attr'>
-        <div className='user'>
-          <img className='user-icon' src={note.avatar} alt='' />
-          <span className='username'>{note.user_name}</span>
-          <span className='update-time'>{dateToFromNow(note.created_at)}</span>
+      <div className='card-content'>
+        <div className='note-title'>
+          <Link to={`/post/${note.id}`}>{note.title}</Link>
         </div>
 
-        <div className='like'>
-          <div>
-            <img src={ICON.bookmark} alt='' />
-            <span>{note.like_num}</span>
+        <div className='note-attr'>
+          <div className='user'>
+            <img className='user-icon' src={note.avatar} alt='' />
+            <span className='username'>{note.user_name}</span>
+            <span className='update-time'>{dateToFromNow(note.created_at)}</span>
           </div>
-          <div>
-            <img src={ICON.comment} alt='' />
-            <span>{note.collect_num}</span>
+
+          <div className='like'>
+            <div>
+              <img src={ICON.bookmark} alt='' />
+              <span>{note.like_num}</span>
+            </div>
+            <div>
+              <img src={ICON.comment} alt='' />
+              <span>{note.collect_num}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export function Find() {
   const [tab, setTab] = useState('all');
   const { status, data, error, isFetching } = usePosts();
+  const { data: hotList } = useHot();
+
+  console.log(data);
 
   const doChangeTab = (e: any) => {
     let key;
@@ -108,16 +114,16 @@ export function Find() {
         {isFetching ? (
           <LoadingOutlined style={{ fontSize: 48 }} />
         ) : (
-          <Spin spinning={isFetching} indicator={<LoadingOutlined style={{ fontSize: 32, color: '#fd281a' }} />}>
+          <div>
             {tab === 'tag' && (
               <div className='m-tags-wrap'>
-                {tagList.map((tag: any) => {
+                {/* {tagList?.map((tag: any) => {
                   return (
                     <div className='m-tag' key={`tab${tag.name}`} onClick={this.doSearch.bind(this, tag.id)}>
                       # <span>{tag.name}</span>
                     </div>
                   );
-                })}
+                })} */}
               </div>
             )}
 
@@ -126,28 +132,30 @@ export function Find() {
               {tab === 'tag' && data?.map((item: any) => <NoteCard key={`node-${item.id}`} note={item} />)}
               {data?.length === 0 && <div className='no-data'>没有更多数据 😯</div>}
             </div>
-          </Spin>
+          </div>
         )}
 
         <div className='find-right-bar'>
           <div className='title'>最热 · 精选</div>
 
           <div className='hot-list'>
-            {/* {hotList.map((item: any) => ( */}
-            {[].map((item: any) => (
-              <div className='item' key={`hot-${item.id}`}>
-                <div className='avatar'>
-                  <img src={item.avatar} alt='' />
-                </div>
+            {hotList?.map((item: any) => {
+              const { User: user } = item;
+              return (
+                <div className='item' key={`hot-${item.id}`}>
+                  <div className='avatar'>
+                    <img src={user.avatar} />
+                  </div>
 
-                <div className='info'>
-                  <div className='item-name'>{item.user_name}</div>
-                  <Link to={`note/${item.id}`}>
-                    <span className='item-title'>{item.title}</span>
-                  </Link>
+                  <div className='info'>
+                    <div className='item-name'>{user.userName}</div>
+                    <Link to={`note/${item.id}`}>
+                      <span className='item-title'>{item.title}</span>
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

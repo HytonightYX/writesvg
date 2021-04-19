@@ -1,7 +1,7 @@
-import { useMutation, useQuery } from 'react-query';
-import { axios_get, axios_post } from './axios';
+import { Query, useMutation, useQuery } from 'react-query';
 import axios from 'axios';
-import { QueryKeys, User } from './types';
+import { axios_get, axios_post } from './axios';
+import { Post, QueryKeys, User } from './types';
 import { queryClient } from 'src/query-client';
 
 const { CancelToken } = axios;
@@ -23,6 +23,21 @@ export const usePosts = () =>
     return data;
   });
 
+export const useMyPosts = () =>
+  useQuery(QueryKeys.MyPosts, async () => {
+    const data = await axios_get('note/mine');
+    return data;
+  });
+
+export const usePostDelete = () =>
+  useMutation((id: number) => axios_get(`note/delete/${id}`), {
+    onSuccess: (data) => {
+      if (data.ok) {
+        queryClient.invalidateQueries(QueryKeys.MyPosts);
+      }
+    },
+  });
+
 export const useUser = () =>
   useQuery<User, Error>(QueryKeys.User, async () => {
     const source = CancelToken.source();
@@ -32,6 +47,12 @@ export const useUser = () =>
     });
 
     return data as User;
+  });
+
+export const useHot = () =>
+  useQuery(QueryKeys.Hot, async () => {
+    const data = axios_get('note/hot');
+    return data;
   });
 
 export const useUserUpdate = () =>
@@ -54,13 +75,15 @@ export const usePost = (id: number) =>
     return data;
   });
 
+export const usePotrace = () => useMutation((originUrl: string) => axios_post('note/potrace', { originUrl }));
+
 export const useUserStatus = () =>
   useQuery([QueryKeys.UserStatus], async () => {
     const data = await axios_get('user/status');
     return data;
   });
 
-export const useCreatePost = () => useMutation((newPost) => axios_post('note/add', newPost));
+export const useCreatePost = () => useMutation((newPost: Post) => axios_post('note/add', newPost));
 
 export const useTabList = (tag: string) =>
   useQuery([QueryKeys.Tabs, tag], async () => {

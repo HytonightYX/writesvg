@@ -1,20 +1,23 @@
 import React, { useCallback } from 'react';
 import { Dropdown, Menu } from 'antd';
 import { Icon, Menu as SemanticMenu } from 'semantic-ui-react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import { ASSETS, MENU_MAIN } from '../../constant/config';
 import { Container } from './styled';
 import { useUser } from 'src/utils/request';
 
 export function Header() {
   const { data: user } = useUser();
-  const history = useHistory();
+  let location = useLocation();
 
   const signout = useCallback(() => {
     localStorage.removeItem('token');
-    history.push('/client');
-    // TODO: remove user from cache
+    window.location.href = '/';
   }, []);
+
+  const isActive = (path: string) => {
+    return path === location.pathname;
+  };
 
   return (
     <Container>
@@ -25,7 +28,7 @@ export function Header() {
           </div>
           {MENU_MAIN.map((item) => (
             <Link to={item.path} key={item.title}>
-              <SemanticMenu.Item name={item.title} active={item.path === window.location.pathname} />
+              <SemanticMenu.Item name={item.title} active={isActive(item.path)} />
             </Link>
           ))}
         </SemanticMenu>

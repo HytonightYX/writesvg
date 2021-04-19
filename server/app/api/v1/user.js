@@ -31,7 +31,7 @@ router.post('/bind', new Auth().m, async (ctx) => {
  */
 router.get('/info', new Auth().m, async ctx => {
 	const user = await User.getUserInfo(ctx.auth.uid)
-	success('登陆成功', user)
+	success('登录成功', user)
 })
 
 /**

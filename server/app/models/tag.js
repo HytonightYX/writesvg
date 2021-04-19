@@ -9,11 +9,8 @@ class Tag extends Model {
    * 展示所有用户标签
    */
   static async showTags() {
-    return await Tag.findAll({
-      where: {
-        author: 0,
-      },
-    });
+    const data = await Tag.findAll();
+    return data;
   }
 
   /**
@@ -31,15 +28,12 @@ class Tag extends Model {
 
 Tag.init(
   {
-    // 记录Id
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
     },
-    // TAG名称
     name: DataTypes.STRING(100),
-    author: DataTypes.INTEGER,
   },
   {
     sequelize: db,

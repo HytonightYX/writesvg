@@ -11,6 +11,7 @@ const { success } = require('../../lib/helper');
 const { Auth } = require('../../../middlewares/auth');
 const dayjs = require('dayjs');
 const multer = require('@koa/multer');
+const potrace = require('potrace');
 
 // 文件上传中间件
 var storage = multer.diskStorage({
@@ -33,7 +34,7 @@ router.post('/add', new Auth().m, async (ctx) => {
   const note = v.get('body');
   note.author = ctx.auth.uid;
   await Note.addNote(note);
-  success('新增成功');
+  success('新闻发布成功');
 });
 
 /**
@@ -41,7 +42,7 @@ router.post('/add', new Auth().m, async (ctx) => {
  */
 router.get('/', async () => {
   const notes = await Note.showAllNotes();
-  success('已更新', notes);
+  success(false, notes);
 });
 
 /**
@@ -49,15 +50,15 @@ router.get('/', async () => {
  */
 router.get('/list', async () => {
   const notes = await Note.showAllNotes(false);
-  success('已更新', notes);
+  success(false, notes);
 });
 
 /**
  * 获取最热文章
  */
 router.get('/hot', async () => {
-  const notes = await Note.showHotNotes();
-  success(null, notes);
+  const posts = await Note.showHotNotes();
+  success(false, posts);
 });
 
 /**
@@ -65,7 +66,7 @@ router.get('/hot', async () => {
  */
 router.get('/like', async () => {
   const notes = await Note.showLikedNotes();
-  success('ok', notes);
+  success(false, notes);
 });
 
 /**
@@ -73,7 +74,7 @@ router.get('/like', async () => {
  */
 router.get('/collect', async () => {
   const notes = await Note.showCollectedNotes();
-  success('ok', notes);
+  success('收藏成功', notes);
 });
 
 /**
@@ -110,8 +111,9 @@ router.post('/upload', new Auth().m, upload.single('file'), (ctx) => {
  * 获取当前用户的文章
  */
 router.get('/mine', new Auth().m, async (ctx) => {
-  const notes = await Note.queryNoteByAuthor(ctx.auth.uid);
-  success('已更新', { notes });
+  const posts = await Note.queryNoteByAuthor(ctx.auth.uid);
+
+  success('已更新', posts);
 });
 
 /**
@@ -143,6 +145,27 @@ router.post('/update', new Auth().m, async (ctx) => {
   const newNote = v.get('body');
   await Note.updateNote(newNote);
   success('文章已更新', { ok: 1 });
+});
+
+function pot(originUrl) {
+  return new Promise((resolve, reject) => {
+    potrace.trace(originUrl, (err, svg) => {
+      if (err) {
+        console.err(err);
+        reject(err);
+      }
+      resolve(svg);
+    });
+  });
+}
+
+/**
+ * Potrace算法处理
+ */
+router.post('/potrace', async (ctx) => {
+  const { originUrl } = ctx.request.body;
+  const svg = await pot(originUrl);
+  success('转换成功', { svg });
 });
 
 /**

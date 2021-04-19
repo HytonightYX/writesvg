@@ -7,6 +7,21 @@ export interface User {
   desc?: string;
 }
 
+export interface Block {
+  _id: number;
+  originUrl?: string;
+  svgUrl?: string;
+}
+
+export interface Post {
+  id: number;
+  title: string;
+  cover?: string;
+  likeNum?: number;
+  collectNum?: number;
+  User: Record<string, unknown>;
+}
+
 export enum QueryKeys {
   Token = 'token',
   User = 'user',
@@ -14,4 +29,6 @@ export enum QueryKeys {
   UserStatus = 'user-status',
   QiniuToken = 'qiniu-token',
   Tabs = 'tabs',
+  MyPosts = 'my-posts',
+  Hot = 'hot-posts',
 }

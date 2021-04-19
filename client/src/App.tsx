@@ -7,7 +7,7 @@ import { Find } from './pages/find';
 import { Write } from './pages/write';
 import { Profile } from './pages/profile';
 import { Login } from './pages/login';
-// import MyNote from './page/mynote';
+import { Mine } from './pages/my';
 import { Note } from './pages/post';
 // import Edit from './page/edit';
 import { Setting } from './pages/setting';
@@ -24,9 +24,8 @@ function App() {
         <LoginGuard>
           <Switch>
             <Route exact path='/login' component={Login} />
-            {/* <Route exact path='/find' component={Find} /> */}
             <Route exact path='/write' component={Write} />
-            {/* <Route exact path='/mynote' component={MyNote} /> */}
+            <Route exact path='/my' component={Mine} />
             <Route exact path='/profile' component={Profile} />
             <Route exact path='/post/:id' component={Note} />
             {/* <Route exact path='/edit/:id' component={Edit} /> */}

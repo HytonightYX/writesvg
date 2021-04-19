@@ -37,9 +37,7 @@ class Write extends React.Component {
         {
           qiniuToken: data.token,
         },
-        () => {
-          console.log('fdskjl', this.state);
-        },
+        () => {},
       );
     });
 

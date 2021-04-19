@@ -1,29 +1,13 @@
-const auth = require('basic-auth');
-const { DataTypes, Model, QueryTypes } = require('sequelize');
+const { DataTypes, Model, QueryTypes, where } = require('sequelize');
 const { db } = require('../../core/db');
 const { Tag } = require('../models/tag');
+const { Block } = require('./block');
 const { User } = require('./user');
 
 /**
  * 笔记文章业务
  */
 class Note extends Model {
-  /**
-   * 用于JSON序列化
-   */
-  toJSON() {
-    return {
-      id: this.id,
-      title: this.title,
-      raw: this.raw,
-      html: this.html,
-      author: this.writerId,
-      tag: this.tag,
-      likeNum: this.likeNum,
-      collectNum: this.collectNum,
-    };
-  }
-
   /**
    * 新增文章,存草稿或者直接发布
    */
@@ -62,18 +46,32 @@ class Note extends Model {
    * 按更新时间降序排序
    */
   static async showHotNotes() {
-    let notes = await db.query(
-      `
-			SELECT u.user_name, u.avatar, n.title,n.tag,n.id
-			FROM note n 
-			LEFT JOIN user u ON n.author = u.id
-			order by n.updated_at DESC
-			LIMIT 0,3
-			`,
-      { raw: true }
-    );
-    notes = this.common(notes);
-    return notes;
+    // let posts = await db.query(
+    //   `
+    // 	SELECT u.user_name, u.avatar, n.title,n.tag,n.id
+    // 	FROM note n
+    // 	LEFT JOIN user u ON n.author = u.id
+    // 	order by n.updated_at DESC
+    // 	LIMIT 0,3
+    // 	`,
+    //   { raw: true }
+    // );
+
+    const posts = await Note.findAll({
+      attributes: {
+        include: ['title', 'id'],
+      },
+      order: [['updatedAt', 'DESC']],
+      limit: 3,
+      include: {
+        model: User,
+        attributes: {
+          include: ['avatar', 'userName'],
+        },
+      },
+    });
+
+    return posts;
   }
 
   /**
@@ -134,18 +132,15 @@ class Note extends Model {
    * @param id 用户ID
    */
   static async queryNoteByAuthor(id) {
-    let notes = await db.query(
-      `
-			SELECT u.user_name, u.avatar, n.*
-			FROM note n 
-			LEFT JOIN user u ON n.author = u.id
-			WHERE n.author = ${id}
-			order by n.created_at DESC
-			`,
-      { raw: true }
-    );
-    notes = this.common(notes);
-    return notes;
+    const posts = await Note.findAll({
+      where: {
+        author: id,
+      },
+      order: [['createdAt', 'DESC']],
+      include: [User],
+    });
+
+    return posts;
   }
 
   /**
@@ -165,7 +160,7 @@ class Note extends Model {
       attributes: ['userName', 'avatar'],
     });
 
-    return { ...post, ...authorInfo };
+    return { ...post, ...authorInfo, blocks: JSON.parse(post.blocks) };
   }
 
   /**
@@ -179,6 +174,7 @@ class Note extends Model {
     }
     // 局部引用、防止循环引用
     const { Favor } = require('../models/favor');
+
     db.transaction(async (t) => {
       await note.destroy({
         force: true,
@@ -248,11 +244,8 @@ class Note extends Model {
         type: 1,
       },
     });
-    if (like) {
-      return true;
-    } else {
-      return false;
-    }
+
+    return !!like;
   }
 
   /**
@@ -269,11 +262,8 @@ class Note extends Model {
         type: 2,
       },
     });
-    if (collect) {
-      return true;
-    } else {
-      return false;
-    }
+
+    return !!collect;
   }
 
   /**
@@ -307,22 +297,6 @@ class Note extends Model {
    */
   static async common(notes) {
     return notes;
-    let tagObj = {};
-    const tags = await Tag.findAll({ raw: true });
-    console.log('tag :>> ', tags);
-
-    tags.forEach((item) => {
-      tagObj[item.id] = item.name;
-    });
-
-    notes = notes[0].map((item) => {
-      let tags = item.tag?.split(',').map((item) => {
-        return { id: item, name: tagObj[item] };
-      });
-      item.tags = tags;
-      return item;
-    });
-    return notes;
   }
 }
 
@@ -338,14 +312,14 @@ Note.init(
     title: DataTypes.STRING(255),
     // 文章封面
     cover: DataTypes.STRING(255),
-    // json内容
-    raw: DataTypes.TEXT,
-    // html内容
-    html: DataTypes.TEXT,
-    // 作者Id
-    author: DataTypes.INTEGER,
     // 文章类型
     tag: DataTypes.STRING(100),
+    blocks: {
+      type: DataTypes.TEXT,
+      set(value) {
+        this.setDataValue('blocks', JSON.stringify(value));
+      },
+    },
     // 点赞数量
     likeNum: {
       type: DataTypes.INTEGER,

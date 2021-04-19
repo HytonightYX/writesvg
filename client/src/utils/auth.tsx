@@ -29,7 +29,7 @@ export function useAuth() {
 }
 
 export function useProvideAuth() {
-  const [user, setUser] = useState<string>();
+  const [user, setUser] = useState<string | null>();
 
   const signin = (cb: any) => {
     return fakeAuth.signin(() => {
