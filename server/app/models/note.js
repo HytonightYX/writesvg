@@ -1,7 +1,7 @@
+const { forOwn } = require('lodash');
 const { DataTypes, Model, QueryTypes, where } = require('sequelize');
 const { db } = require('../../core/db');
 const { Tag } = require('../models/tag');
-const { Block } = require('./block');
 const { User } = require('./user');
 
 /**
@@ -11,10 +11,16 @@ class Note extends Model {
   /**
    * 新增文章,存草稿或者直接发布
    */
-  static async addNote(note) {
-    return await Note.create({
-      ...note,
+  static async addNote(payload) {
+    const { tags } = payload;
+
+    const post = await Note.create({
+      ...payload,
     });
+
+    const tagsInDb = await Tag.bulkCreate(tags.map((tag) => ({ name: tag })));
+
+    await post.addTags(tagsInDb);
   }
 
   /**
@@ -270,25 +276,21 @@ class Note extends Model {
    * 根据标签获取文章
    * @param tag
    */
-  static async queryNoteByTag(tag) {
-    let data = [];
-    let notes = await db.query(
-      `
-			SELECT u.user_name, u.avatar, n.title,n.id,n.author,n.created_at,n.like_num,n.collect_num,n.tag,n.cover
-			FROM note n 
-			LEFT JOIN user u ON n.author = u.id
-			order by n.created_at DESC
-			`,
-      { raw: true }
-    );
-    notes = notes[0];
-    notes.map((item) => {
-      let flag = item.tag.split(',').indexOf(String(tag));
-      if (flag !== -1) {
-        data.push(item);
-      }
+  static async queryNoteByTag(id) {
+    const thisTag = await Tag.findByPk(id);
+    const name = thisTag.name;
+    const isThisTag = await Tag.findAll({
+      where: {
+        name,
+      },
+      include: {
+        model: Note,
+      },
     });
-    return this.common([data]);
+
+    const data = isThisTag.map((tag) => tag.Note);
+
+    return data;
   }
 
   /**
@@ -312,8 +314,6 @@ Note.init(
     title: DataTypes.STRING(255),
     // 文章封面
     cover: DataTypes.STRING(255),
-    // 文章类型
-    tag: DataTypes.STRING(100),
     blocks: {
       type: DataTypes.TEXT,
       set(value) {

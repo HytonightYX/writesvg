@@ -17,8 +17,11 @@ export async function login(code: string) {
   return token;
 }
 
-export const usePosts = () =>
-  useQuery('posts', async () => {
+export const usePosts = (tabId: number) =>
+  useQuery(['posts', tabId], async () => {
+    if (tabId > 0) {
+      return axios_get(`note/bytag/${tabId}`);
+    }
     const data = await axios_get('note/list');
     return data;
   });
@@ -26,6 +29,12 @@ export const usePosts = () =>
 export const useMyPosts = () =>
   useQuery(QueryKeys.MyPosts, async () => {
     const data = await axios_get('note/mine');
+    return data;
+  });
+
+export const useTags = () =>
+  useQuery(QueryKeys.Tags, async () => {
+    const data = await axios_get('tag');
     return data;
   });
 

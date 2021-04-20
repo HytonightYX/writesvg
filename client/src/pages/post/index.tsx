@@ -12,7 +12,6 @@ import { LoadingOutlined } from '@ant-design/icons';
 export function Note() {
   const { id } = useParams<any>();
   const { data: post } = usePost(id);
-  console.log(post);
 
   return (
     <div className='g-note'>

@@ -31,4 +31,5 @@ export enum QueryKeys {
   Tabs = 'tabs',
   MyPosts = 'my-posts',
   Hot = 'hot-posts',
+  Tags = 'tags'
 }

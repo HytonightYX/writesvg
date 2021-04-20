@@ -196,11 +196,11 @@ router.get('/isFavor/:id', new Auth().m, async (ctx) => {
 /**
  * 按照标签获取文章
  */
-router.get('/byTag/:id', async (ctx) => {
+router.get('/bytag/:id', async (ctx) => {
   const v = await new NoteValidator().validate(ctx);
   const tags = v.get('path.id');
   const data = await Note.queryNoteByTag(tags);
-  success(null, { data });
+  success(null, data);
 });
 
 module.exports = router;

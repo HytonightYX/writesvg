@@ -8,8 +8,9 @@ import './style.less';
 import { StyledBlock, Vectorizer } from './styled';
 import { Block } from 'src/utils/types';
 import { useMutation } from 'react-query';
-import { axios_post } from 'src/utils/axios';
 import { svg2file } from 'src/utils/svg';
+import { DebounceSelect, fetchTags } from './select';
+import { axios_post } from 'src/utils/axios';
 
 const { Item } = Form;
 const { BASE_QINIU_URL, QINIU_SERVER } = SYSTEM_CONFIG.qiniu;
@@ -30,6 +31,7 @@ export function Write() {
 
   const [coverUrl, setImgHash] = useState<string>();
   const [loading, setLoading] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const { mutate: startPotrace, isLoading: isPotraceLoading } = useMutation((originUrl: string) =>
     axios_post('note/potrace', { originUrl }),
@@ -38,9 +40,10 @@ export function Write() {
   const submit = useCallback(
     (data) => {
       data.blocks = [...blockData];
+      data.tags = tags.map((item: any) => item.value);
       createPost(data);
     },
-    [blockData],
+    [blockData, tags],
   );
 
   const qiniuUpload = (file: File) => {
@@ -214,12 +217,27 @@ export function Write() {
           </Vectorizer>
         </Item>
 
-        <Button onClick={pushBlock} style={{ marginRight: 12 }}>
-          添加区块
-        </Button>
-        <Button type='primary' htmlType='submit' loading={isSubmitting}>
-          提交
-        </Button>
+        <div>
+          <Button onClick={pushBlock} style={{ marginRight: 12 }}>
+            添加区块
+          </Button>
+        </div>
+
+        <div style={{ marginTop: 12 }}>
+          <DebounceSelect
+            mode='tags'
+            value={tags}
+            placeholder='请选择标签,允许自定义'
+            fetchOptions={fetchTags}
+            onChange={(newValue) => {
+              setTags(newValue);
+            }}
+            style={{ width: '200px', marginRight: 12 }}
+          />
+          <Button type='primary' htmlType='submit' loading={isSubmitting}>
+            提交
+          </Button>
+        </div>
       </Form>
     </div>
   );
