@@ -20,6 +20,8 @@ export interface Post {
   likeNum?: number;
   collectNum?: number;
   User: Record<string, unknown>;
+  blocks: any[];
+  tags: any[];
 }
 
 export enum QueryKeys {
@@ -31,5 +33,5 @@ export enum QueryKeys {
   Tabs = 'tabs',
   MyPosts = 'my-posts',
   Hot = 'hot-posts',
-  Tags = 'tags'
+  Tags = 'tags',
 }

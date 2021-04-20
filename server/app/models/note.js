@@ -156,17 +156,23 @@ class Note extends Model {
   static async queryNoteById(id) {
     const post = await Note.findByPk(id, {
       attributes: {
-        exclude: ['raw', 'updatedAt', 'deletedAt'],
+        exclude: ['updatedAt', 'deletedAt'],
       },
-      raw: true,
+      include: [
+        {
+          model: Tag,
+          attributes: ['id', 'name'],
+        },
+        { model: User, attributes: ['userName', 'avatar'] },
+      ],
     });
 
-    const authorInfo = await User.findByPk(post.author, {
-      raw: true,
-      attributes: ['userName', 'avatar'],
-    });
+    // const authorInfo = await User.findByPk(post.author, {
+    //   raw: true,
+    //   attributes: ['userName', 'avatar'],
+    // });
 
-    return { ...post, ...authorInfo, blocks: JSON.parse(post.blocks) };
+    return post.get({ plain: true });
   }
 
   /**
@@ -224,7 +230,8 @@ class Note extends Model {
     if (!oldNote) {
       throw new global.errs.NotFound();
     }
-    Note.update(
+    console.dir(note)
+    await Note.update(
       {
         ...note,
       },

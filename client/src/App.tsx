@@ -9,7 +9,6 @@ import { Profile } from './pages/profile';
 import { Login } from './pages/login';
 import { Mine } from './pages/my';
 import { Note } from './pages/post';
-// import Edit from './page/edit';
 import { Setting } from './pages/setting';
 
 import 'antd/dist/antd.css';
@@ -28,7 +27,7 @@ function App() {
             <Route exact path='/my' component={Mine} />
             <Route exact path='/profile' component={Profile} />
             <Route exact path='/post/:id' component={Note} />
-            {/* <Route exact path='/edit/:id' component={Edit} /> */}
+            <Route exact path='/edit/:id' component={Write} />
             <Route exact path='/setting' component={Setting} />
 
             <Route path='/' component={Find} />

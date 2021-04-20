@@ -81,7 +81,7 @@ export const useQiniuToken = () =>
 export const usePost = (id: number) =>
   useQuery([QueryKeys.Post, id], async () => {
     const data = await axios_get(`note/${id}`);
-    return data;
+    return data as Post;
   });
 
 export const usePotrace = () => useMutation((originUrl: string) => axios_post('note/potrace', { originUrl }));

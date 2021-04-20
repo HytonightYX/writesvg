@@ -33,6 +33,10 @@ router.post('/add', new Auth().m, async (ctx) => {
   const v = await new AddNoteValidator().validate(ctx);
   const note = v.get('body');
   note.author = ctx.auth.uid;
+  if (note.id) {
+    await Note.updateNote(note);
+    success('文章已更新');
+  }
   await Note.addNote(note);
   success('新闻发布成功');
 });
@@ -174,8 +178,12 @@ router.post('/potrace', async (ctx) => {
 router.get('/:id', async (ctx) => {
   const v = await new PositiveIntegerValidator().validate(ctx, { id: 'id' });
   const id = v.get('path.id');
-  const content = await Note.queryNoteById(id);
-  success(null, content);
+  const data = await Note.queryNoteById(id);
+
+  data.tags = data.Tags.map((tag) => ({ value: tag.id, label: tag.name }));
+  data.blocks = JSON.parse(data.blocks);
+
+  success(null, { ...data, ...data.User });
 });
 
 /**

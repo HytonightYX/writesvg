@@ -3,7 +3,7 @@ import { Form, Input, Button, Spin, message, Upload, Image } from 'antd';
 import { ArrowRightOutlined, InboxOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import * as qiniu from 'qiniu-js';
 import { SYSTEM_CONFIG } from '../../constant/config';
-import { useCreatePost, useQiniuToken } from 'src/utils/request';
+import { useCreatePost, usePost, useQiniuToken } from 'src/utils/request';
 import './style.less';
 import { StyledBlock, Vectorizer } from './styled';
 import { Block } from 'src/utils/types';
@@ -11,6 +11,7 @@ import { useMutation } from 'react-query';
 import { svg2file } from 'src/utils/svg';
 import { DebounceSelect, fetchTags } from './select';
 import { axios_post } from 'src/utils/axios';
+import { useParams } from 'react-router';
 
 const { Item } = Form;
 const { BASE_QINIU_URL, QINIU_SERVER } = SYSTEM_CONFIG.qiniu;
@@ -23,6 +24,9 @@ const CoverButton = () => (
 );
 
 export function Write() {
+  const { id: postId } = useParams();
+  const { data: existPost } = usePost(postId);
+
   const { data: qiniuToken, isFetching: isTokenFetching } = useQiniuToken();
   const { mutate: createPost, isLoading: isSubmitting } = useCreatePost();
 
@@ -37,10 +41,21 @@ export function Write() {
     axios_post('note/potrace', { originUrl }),
   );
 
+  useEffect(() => {
+    if (existPost) {
+      console.log(existPost);
+      form.setFieldsValue({ ...existPost });
+      setTags(existPost.tags);
+      setData(existPost.blocks);
+      setImgHash(existPost.cover + '?imageslim');
+    }
+  }, [existPost]);
+
   const submit = useCallback(
     (data) => {
       data.blocks = [...blockData];
       data.tags = tags.map((item: any) => item.value);
+      data.id = postId;
       createPost(data);
     },
     [blockData, tags],
